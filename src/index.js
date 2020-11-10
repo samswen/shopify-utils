@@ -72,14 +72,23 @@ module.exports = {
 };
 
 let logger = console;
-
+let http_request_timeout = 180000;
 let main_location_id = null;
 let aws_events_arn = null;
+let shopify_api_version = '2020-07';
 
 function setup(config, arg_logger) {
     if (config) {
         main_location_id = config.get('main_location_id');
         aws_events_arn = config.get('aws_events_arn');
+        const request_timeout = config.get('http_request_timeout');
+        if (request_timeout) {
+            http_request_timeout = request_timeout;
+        }
+        const api_version = config.get('shopify_api_version');
+        if (api_version) {
+            shopify_api_version = api_version;
+        }
     }
     if (arg_logger) {
         logger = arg_logger;
@@ -88,7 +97,7 @@ function setup(config, arg_logger) {
 
 async function get_myshop_info(client) {
     try {
-        const options = get_axios_options(client, 'get', '/admin/api/2020-07/shop.json');
+        const options = get_axios_options(client, 'get', `/admin/api/${shopify_api_version}/shop.json`);
         const response = await axios_multi_tries(options);
         return response.data;
     } catch(err) {
@@ -99,7 +108,7 @@ async function get_myshop_info(client) {
 
 async function get_script_tags_count(client) {
     try {
-        const options = get_axios_options(client, 'get', `/admin/api/2020-07/script_tags/count.json`);
+        const options = get_axios_options(client, 'get', `/admin/api/${shopify_api_version}/script_tags/count.json`);
         const response = await axios_multi_tries(options);
         return response.data;
     } catch(err) {
@@ -110,7 +119,7 @@ async function get_script_tags_count(client) {
 
 async function get_script_tag(client, tag_id) {
     try {
-        const options = get_axios_options(client, 'get', `/admin/api/2020-07/script_tags/${tag_id}.json`);
+        const options = get_axios_options(client, 'get', `/admin/api/${shopify_api_version}/script_tags/${tag_id}.json`);
         const response = await axios_multi_tries(options);
         return response.data;
     } catch(err) {
@@ -121,7 +130,7 @@ async function get_script_tag(client, tag_id) {
 
 async function delete_script_tag(client, tag_id) {
     try {
-        const options = get_axios_options(client, 'delete', `/admin/api/2020-07/script_tags/${tag_id}.json`);
+        const options = get_axios_options(client, 'delete', `/admin/api/${shopify_api_version}/script_tags/${tag_id}.json`);
         const response = await axios_multi_tries(options);
         return response.data;
     } catch(err) {
@@ -132,7 +141,7 @@ async function delete_script_tag(client, tag_id) {
 
 async function put_script_tag(client, tag_id, data) {
     try {
-        const options = get_axios_options(client, 'put', `/admin/api/2020-07/script_tags/${tag_id}.json`, null, data);
+        const options = get_axios_options(client, 'put', `/admin/api/${shopify_api_version}/script_tags/${tag_id}.json`, null, data);
         const response = await axios_multi_tries(options);
         return response.data;
     } catch(err) {
@@ -143,7 +152,7 @@ async function put_script_tag(client, tag_id, data) {
 
 async function post_script_tag(client, data) {
     try {
-        const options = get_axios_options(client, 'post', '/admin/api/2020-07/script_tags.json', null, data);
+        const options = get_axios_options(client, 'post', `/admin/api/${shopify_api_version}/script_tags.json`, null, data);
         const response = await axios_multi_tries(options);
         return response.data;
     } catch(err) {
@@ -154,7 +163,7 @@ async function post_script_tag(client, data) {
 
 async function get_script_tags(client) {
     try {
-        const options = get_axios_options(client, 'get', `/admin/api/2020-07/script_tags.json`);
+        const options = get_axios_options(client, 'get', `/admin/api/${shopify_api_version}/script_tags.json`);
         const response = await axios_multi_tries(options);
         return response.data;
     } catch(err) {
@@ -165,7 +174,7 @@ async function get_script_tags(client) {
 
 async function get_asset(client, theme_id, filepath) {
     try {
-        const options = get_axios_options(client, 'get', `/admin/api/2020-07/themes/${theme_id}/assets.json?asset[key]=${filepath}`);
+        const options = get_axios_options(client, 'get', `/admin/api/${shopify_api_version}/themes/${theme_id}/assets.json?asset[key]=${filepath}`);
         const response = await axios_multi_tries(options);
         return response.data;
     } catch(err) {
@@ -176,7 +185,7 @@ async function get_asset(client, theme_id, filepath) {
 
 async function put_asset(client, theme_id, data) {
     try {
-        const options = get_axios_options(client, 'put', `/admin/api/2020-07/themes/${theme_id}/assets.json`, null, data);
+        const options = get_axios_options(client, 'put', `/admin/api/${shopify_api_version}/themes/${theme_id}/assets.json`, null, data);
         const response = await axios_multi_tries(options);
         return response.data;
     } catch(err) {
@@ -187,7 +196,7 @@ async function put_asset(client, theme_id, data) {
 
 async function delete_asset(client, theme_id, filepath) {
     try {
-        const options = get_axios_options(client, 'delete', `/admin/api/2020-07/themes/${theme_id}/assets.json?asset[key]=${filepath}`);
+        const options = get_axios_options(client, 'delete', `/admin/api/${shopify_api_version}/themes/${theme_id}/assets.json?asset[key]=${filepath}`);
         const response = await axios_multi_tries(options);
         return response.data;
     } catch(err) {
@@ -198,7 +207,7 @@ async function delete_asset(client, theme_id, filepath) {
 
 async function get_assets(client, theme_id) {
     try {
-        const options = get_axios_options(client, 'get', `/admin/api/2020-07/themes/${theme_id}/assets.json`);
+        const options = get_axios_options(client, 'get', `/admin/api/${shopify_api_version}/themes/${theme_id}/assets.json`);
         const response = await axios_multi_tries(options);
         return response.data;
     } catch(err) {
@@ -209,7 +218,7 @@ async function get_assets(client, theme_id) {
 
 async function get_themes(client) {
     try {
-        const options = get_axios_options(client, 'get', '/admin/api/2020-07/themes.json');
+        const options = get_axios_options(client, 'get', `/admin/api/${shopify_api_version}/themes.json`);
         const response = await axios_multi_tries(options);
         return response.data;
     } catch(err) {
@@ -220,7 +229,7 @@ async function get_themes(client) {
 
 async function get_theme(client, theme_id) {
     try {
-        const options = get_axios_options(client, 'get', `/admin/api/2020-07/themes/${theme_id}.json`);
+        const options = get_axios_options(client, 'get', `/admin/api/${shopify_api_version}/themes/${theme_id}.json`);
         const response = await axios_multi_tries(options);
         return response.data;
     } catch(err) {
@@ -231,7 +240,7 @@ async function get_theme(client, theme_id) {
 
 async function post_theme(client, data) {
     try {
-        const options = get_axios_options(client, 'post', '/admin/api/2020-07/themes.json', null, data);
+        const options = get_axios_options(client, 'post', `/admin/api/${shopify_api_version}/themes.json`, null, data);
         const response = await axios_multi_tries(options);
         return response.data;
     } catch(err) {
@@ -242,7 +251,7 @@ async function post_theme(client, data) {
 
 async function put_theme(client, theme_id, data) {
     try {
-        const options = get_axios_options(client, 'put', `/admin/api/2020-07/themes/${theme_id}.json`, null, data);
+        const options = get_axios_options(client, 'put', `/admin/api/${shopify_api_version}/themes/${theme_id}.json`, null, data);
         const response = await axios_multi_tries(options);
         return response.data;
     } catch(err) {
@@ -253,7 +262,7 @@ async function put_theme(client, theme_id, data) {
 
 async function delete_theme(client, theme_id) {
     try {
-        const options = get_axios_options(client, 'delete', `/admin/api/2020-07/themes/${theme_id}.json`);
+        const options = get_axios_options(client, 'delete', `/admin/api/${shopify_api_version}/themes/${theme_id}.json`);
         const response = await axios_multi_tries(options);
         return response.data;
     } catch(err) {
@@ -264,7 +273,7 @@ async function delete_theme(client, theme_id) {
 
 async function get_locations(client) {
     try {
-        const options = get_axios_options(client, 'get', '/admin/api/2020-07/locations.json');
+        const options = get_axios_options(client, 'get', `/admin/api/${shopify_api_version}/locations.json`);
         const response = await axios_multi_tries(options);
         return response.data;
     } catch(err) {
@@ -279,7 +288,7 @@ async function set_inventory_levels(client, inventory_item_id, available, locati
             location_id = main_location_id;
         }
         const data = { location_id, inventory_item_id, available};
-        const options = get_axios_options(client, 'post', '/admin/api/2020-07/inventory_levels/set.json', null, data);
+        const options = get_axios_options(client, 'post', `/admin/api/${shopify_api_version}/inventory_levels/set.json`, null, data);
         const response = await axios_multi_tries(options);
         return response.data;
     } catch(err) {
@@ -523,7 +532,7 @@ async function reorder_media_graphql(client, graphql_api_id, moves) {
     }`;
     const query = query_template.replace(/(\n|\r)/gm, ' ').replace(/ +(?= )/g,'');
     const variables = {graphql_api_id, moves};
-    const options = get_axios_options(client, 'post', '/admin/api/2020-07/graphql.json', null, {variables, query});
+    const options = get_axios_options(client, 'post', `/admin/api/${shopify_api_version}/graphql.json`, null, {variables, query});
     const response = await axios_multi_tries(options);
     if (response) {
         return response.data;
@@ -578,7 +587,7 @@ async function get_all_media_graphql(client, graphql_api_id, total = 100) {
     }`;
     const query = query_template.replace(/(\n|\r)/gm, ' ').replace(/ +(?= )/g,'');
     const variables = {graphql_api_id, total};
-    const options = get_axios_options(client, 'post', '/admin/api/2020-07/graphql.json', null, {variables, query});
+    const options = get_axios_options(client, 'post', `/admin/api/${shopify_api_version}/graphql.json`, null, {variables, query});
     const response = await axios_multi_tries(options);
     if (response) {
         return response.data;
@@ -717,7 +726,7 @@ async function get_staged_urls_graphql(client, filenames, path = '.') {
     }`;
     const query = query_template.replace(/(\n|\r)/gm, ' ').replace(/ +(?= )/g,'');
     const variables = {input};
-    const options = get_axios_options(client, 'post', '/admin/api/2020-07/graphql.json', null, {variables, query});
+    const options = get_axios_options(client, 'post', `/admin/api/${shopify_api_version}/graphql.json`, null, {variables, query});
     const response = await axios_multi_tries(options);
     if (response) {
         return response.data;
@@ -787,7 +796,7 @@ async function add_videos_graphql(client, graphql_api_id, videos) {
     }`;
     const query = query_template.replace(/(\n|\r)/gm, ' ').replace(/ +(?= )/g,'');
     const variables = {graphql_api_id, media};
-    const options = get_axios_options(client, 'post', '/admin/api/2020-07/graphql.json', null, {variables, query});
+    const options = get_axios_options(client, 'post', `/admin/api/${shopify_api_version}/graphql.json`, null, {variables, query});
     const response = await axios_multi_tries(options);
     if (response) {
         return response.data;
@@ -830,7 +839,7 @@ function spawn_cmd(cmd, args = null, timeout = 600, console_print = false) {
 
 async function get_product(client, product_id, query) {
     try {
-        const options = get_axios_options(client, 'get', '/admin/api/2020-07/products/' + product_id + '.json', query);
+        const options = get_axios_options(client, 'get', `/admin/api/${shopify_api_version}/products/${product_id}.json`, query);
         const response = await axios_multi_tries(options);
         return response.data;
     } catch(err) {
@@ -841,7 +850,7 @@ async function get_product(client, product_id, query) {
 
 async function get_images(client, product_id, query) {
     try {
-        const options = get_axios_options(client, 'get', '/admin/api/2020-07/products/' + product_id + '/images.json', query);
+        const options = get_axios_options(client, 'get', `/admin/api/${shopify_api_version}/products/${product_id}/images.json`, query);
         const response = await axios_multi_tries(options);
         return response.data;
     } catch(err) {
@@ -852,7 +861,7 @@ async function get_images(client, product_id, query) {
 
 async function find_product(client, query) {
     try {
-        const options = get_axios_options(client, 'get', '/admin/api/2020-07/products.json', query);
+        const options = get_axios_options(client, 'get', `/admin/api/${shopify_api_version}/products.json`, query);
         const response = await axios_multi_tries(options);
         return response.data;
     } catch(err) {
@@ -863,12 +872,12 @@ async function find_product(client, query) {
 
 async function get_product_metafields(client, product_id, query) {
     const q = prepare_query(query);
-    const url = '/admin/api/2020-07/products/' + product_id + '/metafields.json';
+    const url = `/admin/api/${shopify_api_version}/products/${product_id}/metafields.json`;
     return get_all_items(client, url, q);
 }
 
 async function post_product(client, product) {
-    const options = get_axios_options(client, 'post', '/admin/api/2020-07/products.json', null, product);
+    const options = get_axios_options(client, 'post', `/admin/api/${shopify_api_version}/products.json`, null, product);
     const response = await axios_multi_tries(options);
     if (response) {
         return response.data;
@@ -879,12 +888,12 @@ async function post_product(client, product) {
 
 async function get_all_webhooks(client, query) {
     const q = prepare_query(query);
-    const url = '/admin/api/2020-07/webhooks.json';
+    const url = `/admin/api/${shopify_api_version}/webhooks.json`;
     return get_all_items(client, url, q);
 }
 
 async function delete_webhook(client, id) {
-    const options = get_axios_options(client, 'delete', '/admin/api/2020-07/webhooks/' +id + '.json');
+    const options = get_axios_options(client, 'delete', `/admin/api/${shopify_api_version}/webhooks/${id}.json`);
     const response = await axios_multi_tries(options);
     if (response) {
         return response.data;
@@ -895,7 +904,7 @@ async function delete_webhook(client, id) {
 
 async function subscribe_webhook_event(client, topic, url = null) {
     const data = { webhook: { topic, address: url ? url : aws_events_arn, format: "json" }};
-    const options = get_axios_options(client, 'post', '/admin/api/2020-07/webhooks.json', null, data);
+    const options = get_axios_options(client, 'post', `/admin/api/${shopify_api_version}/webhooks.json`, null, data);
     const response = await axios_multi_tries(options);
     if (response) {
         return response.data;
@@ -905,7 +914,7 @@ async function subscribe_webhook_event(client, topic, url = null) {
 }
 
 async function put_product(client, product_id, data) {
-    const options = get_axios_options(client, 'put', '/admin/api/2020-07/products/' + product_id + '.json', null, data);
+    const options = get_axios_options(client, 'put', `/admin/api/${shopify_api_version}/products/${product_id}.json`, null, data);
     const response = await axios_multi_tries(options);
     if (response) {
         return response.data;
@@ -915,7 +924,7 @@ async function put_product(client, product_id, data) {
 }
 
 async function post_product_metafields(client, product_id, data) {
-    const url = '/admin/api/2020-07/products/' + product_id + '/metafields.json';
+    const url = `/admin/api/${shopify_api_version}/products/$product_id}/metafields.json`;
     const options = get_axios_options(client, 'post', url, null, data);
     const response = await axios_multi_tries(options);
     return (response != null);
@@ -923,12 +932,12 @@ async function post_product_metafields(client, product_id, data) {
 
 async function get_variant_metafields(client, product_id, variant_id, query) {
     const q = prepare_query(query);
-    const url = '/admin/api/2020-07/products/' + product_id + '/variants/' + variant_id + '/metafields.json';
+    const url = `/admin/api/${shopify_api_version}/products/${product_id}/variants/${variant_id}/metafields.json`;
     return get_all_items(client, url, q);
 }
 
 async function post_variant_metafields(client, product_id, variant_id, data) {
-    const url = '/admin/api/2020-07/products/' + product_id + '/variants/' + variant_id + '/metafields.json';
+    const url = `/admin/api/${shopify_api_version}/products/${product_id}/variants/${variant_id}/metafields.json`;
     const options = get_axios_options(client, 'post', url, null, data);
     const response = await axios_multi_tries(options);
     return (response != null);
@@ -937,31 +946,31 @@ async function post_variant_metafields(client, product_id, variant_id, data) {
 
 async function get_all_products(client, query) {
     const q = prepare_query(query);
-    const url = '/admin/api/2020-07/products.json';
+    const url = `/admin/api/${shopify_api_version}/products.json`;
     return get_all_items(client, url, q);
 }
 
 async function get_metafields(client, query) {
     const q = prepare_query(query);
-    const url = '/admin/api/2020-07/metafields.json';
+    const url = `/admin/api/${shopify_api_version}/metafields.json`;
     return get_all_items(client, url, q);
 }
 
 async function get_all_smart_collections(client, query) {
     const q = prepare_query(query);
-    const url = '/admin/api/2020-07/smart_collections.json';
+    const url = `/admin/api/${shopify_api_version}/smart_collections.json`;
     return get_all_items(client, url, q);
 }
 
 async function get_all_custom_collections(client, query) {
     const q = prepare_query(query);
-    const url = '/admin/api/2020-07/custom_collections.json';
+    const url = `/admin/api/${shopify_api_version}/custom_collections.json`;
     return get_all_items(client, url, q);
 }
 
 async function get_all_collects(client, query) {
     const q = prepare_query(query);
-    const url = '/admin/api/2020-07/collects.json';
+    const url = `/admin/api/${shopify_api_version}/collects.json`;
     return get_all_items(client, url, q);
 }
 
@@ -970,14 +979,14 @@ async function delete_all_metafields(client, query) {
     for (const product of products) {
         const metafields = await get_product_metafields(product.id);
         for (const metafield of metafields) {
-            const url ='/admin/api/2020-07/metafields/' + metafield.id + '.json';
+            const url =`/admin/api/${shopify_api_version}/metafields/${metafield.id}.json`;
             const options = get_axios_options(client, 'delete', url);
             await axios_multi_tries(options);
         }
         for (const variant of product.variants) {
             const variant_metafields = await get_variant_metafields(client, product.id, variant.id);
             for (const metafield of variant_metafields) {
-                const url ='/admin/api/2020-07/metafields/' + metafield.id + '.json';
+                const url =`/admin/api/${shopify_api_version}/metafields/${metafield.id}.json`;
                 const options = get_axios_options(client, 'delete', url);
                 await axios_multi_tries(options);
             }
@@ -986,7 +995,7 @@ async function delete_all_metafields(client, query) {
 }
 
 async function get_products_count(client) {
-    const options = get_axios_options(client, 'get', '/admin/api/2020-07/products/count.json');
+    const options = get_axios_options(client, 'get', `/admin/api/${shopify_api_version}/products/count.json`);
     const response = await axios_multi_tries(options);
     if (response) {
         return response.data;
@@ -996,7 +1005,7 @@ async function get_products_count(client) {
 }
 
 async function get_smart_collections_count(client) {
-    const options = get_axios_options(client, 'get', '/admin/api/2020-07/smart_collections/count.json');
+    const options = get_axios_options(client, 'get', `/admin/api/${shopify_api_version}/smart_collections/count.json`);
     const response = await axios_multi_tries(options);
     if (response) {
         return response.data;
@@ -1006,7 +1015,7 @@ async function get_smart_collections_count(client) {
 }
 
 async function get_custom_collections_count(client) {
-    const options = get_axios_options(client, 'get', '/admin/api/2020-07/custom_collections/count.json');
+    const options = get_axios_options(client, 'get', `/admin/api/${shopify_api_version}/custom_collections/count.json`);
     const response = await axios_multi_tries(options);
     if (response) {
         return response.data;
@@ -1017,31 +1026,31 @@ async function get_custom_collections_count(client) {
 
 async function get_next_page_products(client, cursor, query) {
     const q = prepare_query(query);
-    const url = '/admin/api/2020-07/products.json';
+    const url = `/admin/api/${shopify_api_version}/products.json`;
     return get_next_page_items(client, url, q, cursor);
 }
 
 async function get_next_page_collects(client, cursor, query) {
     const q = prepare_query(query);
-    const url = '/admin/api/2020-07/collects.json';
+    const url = `/admin/api/${shopify_api_version}/collects.json`;
     return get_next_page_items(client, url, q, cursor);
 }
 
 async function get_collection_metafields(client, collection_id, query) {
     const q = prepare_query(query);
-    const url = '/admin/api/2020-07/collections/' + collection_id + '/metafields.json';
+    const url = `/admin/api/${shopify_api_version}/collections/${collection_id}/metafields.json`;
     return get_all_items(client, url, q);
 }
 
 async function get_next_page_smart_collections(client, cursor, query) {
     const q = prepare_query(query);
-    const url = '/admin/api/2020-07/smart_collections.json';
+    const url = `/admin/api/${shopify_api_version}/smart_collections.json`;
     return get_next_page_items(client, url, q, cursor);
 }
 
 async function get_next_page_custom_collections(client, cursor, query) {
     const q = prepare_query(query);
-    const url = '/admin/api/2020-07/custom_collections.json';
+    const url = `/admin/api/${shopify_api_version}/custom_collections.json`;
     return get_next_page_items(client, url, q, cursor);
 }
 
@@ -1154,7 +1163,7 @@ async function bulk_update_products(client, query, update, max_promises = 4) {
 }
 
 async function delete_product(client, product_id) {
-    const options = get_axios_options(client, 'delete', '/admin/api/2020-07/products/' + product_id + '.json');
+    const options = get_axios_options(client, 'delete', `/admin/api/${shopify_api_version}/products/${product_id}.json`);
     const response = await axios_multi_tries(options);
     if (response) {
         return response.data;
@@ -1194,7 +1203,7 @@ async function update_inventory_item(client, inventory_item_id, update) {
     const data = {
         inventory_item: update
     };
-    const options = get_axios_options(client, 'put', '/admin/api/2020-07/inventory_items/' + inventory_item_id + '.json', null, data);
+    const options = get_axios_options(client, 'put', `/admin/api/${shopify_api_version}/inventory_items/${inventory_item_id}.json`, null, data);
     const response = await axios_multi_tries(options);
     if (response) {
         return response.data;
@@ -1283,7 +1292,7 @@ async function update_product_metafields(client, product_id, updates, namespace 
                         metafield: { id: metafield.id, value, value_type }
                     };
                     if (!dryrun) {
-                        const url = '/admin/api/2020-07/products/' + product_id + '/metafields/' + metafield.id + '.json';
+                        const url = `/admin/api/${shopify_api_version}/products/${product_id}/metafields/${metafield.id}.json`;
                         const options = get_axios_options(client, 'put', url, null, data);
                         await axios_multi_tries(options);
                     } else {
@@ -1309,7 +1318,7 @@ async function update_product_metafields(client, product_id, updates, namespace 
             metafield: { namespace, key, value, value_type }
         };
         if (!dryrun) {
-            const url = '/admin/api/2020-07/products/' + product_id + '/metafields.json';
+            const url = `/admin/api/${shopify_api_version}/products/${product_id}/metafields.json`;
             const options = get_axios_options(client, 'post', url, null, data);
             // eslint-disable-next-line no-unused-vars
             const response = await axios_multi_tries(options);
@@ -1331,7 +1340,7 @@ async function update_product_metafields(client, product_id, updates, namespace 
         for (const key in extra) {
             const metafield_id = extra[key];
             if (!dryrun) {
-                const url = '/admin/api/2020-07/products/' + product_id + '/metafields/' + metafield_id + '.json';
+                const url = `/admin/api/${shopify_api_version}/products/${product_id}/metafields/${metafield_id}.json`;
                 const options = get_axios_options(client, 'delete', url);
                 await axios_multi_tries(options);
             } else {
@@ -1342,7 +1351,7 @@ async function update_product_metafields(client, product_id, updates, namespace 
 }
 
 async function delete_metafield(client, metafield_id) {
-    const url = '/admin/api/2020-07/metafields/' + metafield_id + '.json';
+    const url = `/admin/api/${shopify_api_version}/metafields/${metafield_id}.json`;
     const options = get_axios_options(client, 'delete', url);
     await axios_multi_tries(options);
 }
@@ -1447,6 +1456,9 @@ function get_axios_options(client, method, api_url, query, data) {
     }
     if (data) {
         options.data = data;
+    }
+    if (http_request_timeout) {
+        options.timeout = http_request_timeout;
     }
     return options;
 }

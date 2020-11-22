@@ -11,6 +11,7 @@ module.exports = {
     get_myshop_info,
     get_locations,
     get_product,
+    get_collection,
     find_product,
     subscribe_webhook_event,
     delete_webhook,
@@ -848,6 +849,17 @@ async function get_product(client, product_id, query) {
     }
 }
 
+async function get_collection(client, collection_id, query) {
+    try {
+        const options = get_axios_options(client, 'get', `/admin/api/${shopify_api_version}/collections/${collection_id}.json`, query);
+        const response = await axios_multi_tries(options);
+        return response.data;
+    } catch(err) {
+        logger.error(err.message);
+        return false;
+    }
+}
+
 async function get_images(client, product_id, query) {
     try {
         const options = get_axios_options(client, 'get', `/admin/api/${shopify_api_version}/products/${product_id}/images.json`, query);
@@ -1385,7 +1397,7 @@ async function axios_multi_tries(options) {
             const response = await axios(options);
             if (is_graphql && response && response.data && response.data.errors && 
                 Array.isArray(response.data.errors) && response.data.errors.length > 0 &&
-                response.data.errors[0].message ===  'Throttled') {
+                response.data.errors[0].message === 'Throttled') {
                 logger.warn('graphql call throttled');
                 await sleep(1000*(i*i+1));
                 continue;

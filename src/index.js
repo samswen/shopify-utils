@@ -1,7 +1,6 @@
 'use strict';
 
 const axios = require('axios');
-const { registerInterceptor } = require('axios-cached-dns-resolve');
 const fs = require('fs');
 const os = require('os');
 const { spawn } = require('child_process');
@@ -92,8 +91,6 @@ function setup(config, arg_logger) {
             shopify_api_version = api_version;
         }
     }
-    const axiosClient = axios.create(config);
-    registerInterceptor(axiosClient);
     if (arg_logger) {
         logger = arg_logger;
     }

@@ -1422,7 +1422,7 @@ async function axios_multi_tries(options) {
     return null;
 }
 
-let multiple_apps_index = 0;
+let multiple_apps_indexes = {};
 
 function get_axios_options(client, method, api_url, query, data) {
     if (!client) {
@@ -1453,16 +1453,20 @@ function get_axios_options(client, method, api_url, query, data) {
     }
     const headers = { accept: 'application/json' };
     if (!has_page_info && client.multiple_apps) {
+        const store_name = client.store_name;
+        if (!multiple_apps_indexes.hasOwnProperty(store_name)) {
+            multiple_apps_indexes[store_name] = 0;
+        }
         let done = false;
-        if (multiple_apps_index === client.multiple_apps.length) {
-            multiple_apps_index = 0;
+        if (multiple_apps_indexes[store_name] === client.multiple_apps.length) {
+            multiple_apps_indexes[store_name] = 0;
             if (client.store_access_token) {
                 done = true;
                 headers['X-Shopify-Access-Token'] = client.store_access_token;
             }
         }
         if (!done) {
-            const app = client.multiple_apps[multiple_apps_index++];
+            const app = client.multiple_apps[multiple_apps_indexes[store_name]++];
             const url = new URL(shopify_url);
             url.username = app.store_api_key;
             url.password = app.store_password;

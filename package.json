@@ -1,6 +1,6 @@
 {
   "name": "@samwen/shopify-utils",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "a collection of functions for using shopify apis",
   "main": "src/index.js",
   "scripts": {
@@ -28,7 +28,6 @@
   },
   "dependencies": {
     "axios": "^0.21.0",
-    "axios-cached-dns-resolve": "^1.2.1",
     "child_process": "^1.0.2",
     "fs": "0.0.1-security",
     "os": "^0.1.1"

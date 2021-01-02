@@ -1422,6 +1422,8 @@ async function axios_multi_tries(options) {
     return null;
 }
 
+let multiple_apps_index = 0;
+
 function get_axios_options(client, method, api_url, query, data) {
     if (!client) {
         logger.error('client is empty');
@@ -1436,6 +1438,7 @@ function get_axios_options(client, method, api_url, query, data) {
         logger.error('missing store_url in store_info');
         return null;
     }
+    const has_page_info = shopify_url.indexOf('page_info=') !== -1;
     if (query) {
         let search = '';
         for (const key in query) {
@@ -1449,7 +1452,23 @@ function get_axios_options(client, method, api_url, query, data) {
         shopify_url += search;
     }
     const headers = { accept: 'application/json' };
-    if (client.store_access_token) {
+    if (!has_page_info && client.multiple_apps) {
+        let done = false;
+        if (multiple_apps_index === client.multiple_apps.length) {
+            multiple_apps_index = 0;
+            if (client.store_access_token) {
+                done = true;
+                headers['X-Shopify-Access-Token'] = client.store_access_token;
+            }
+        }
+        if (!done) {
+            const app = client.multiple_apps[multiple_apps_index++];
+            const url = new URL(shopify_url);
+            url.username = app.store_api_key;
+            url.password = app.store_password;
+            shopify_url = url.toString();
+        }
+    } else if (client.store_access_token) {
         headers['X-Shopify-Access-Token'] = client.store_access_token;
     } else if (client.store_api_key && client.store_password) {
         const url = new URL(shopify_url);

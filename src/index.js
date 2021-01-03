@@ -1442,7 +1442,6 @@ function get_axios_options(client, method, api_url, query, data) {
         logger.error('missing store_url in store_info');
         return null;
     }
-    const has_page_info = shopify_url.indexOf('page_info=') !== -1;
     if (query) {
         let search = '';
         for (const key in query) {
@@ -1456,7 +1455,7 @@ function get_axios_options(client, method, api_url, query, data) {
         shopify_url += search;
     }
     const headers = { accept: 'application/json' };
-    if (!has_page_info && client.multiple_apps) {
+    if (client.multiple_apps) {
         const store_name = client.store_name;
         const length = client.multiple_apps.length;
         let done  = false;

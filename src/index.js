@@ -1459,16 +1459,23 @@ function get_axios_options(client, method, api_url, query, data) {
     if (!has_page_info && client.multiple_apps) {
         const store_name = client.store_name;
         const length = client.multiple_apps.length;
+        let done  = false;
         if (!multiple_apps_indexes.hasOwnProperty(store_name)) {
             multiple_apps_indexes[store_name] = get_random_int(0, length - 1);
         } else if (multiple_apps_indexes[store_name] === length) {
             multiple_apps_indexes[store_name] = 0;
+            if (client.store_access_token) {
+                done = true;
+                headers['X-Shopify-Access-Token'] = client.store_access_token;
+            }
         }
-        const app = client.multiple_apps[multiple_apps_indexes[store_name]++];
-        const url = new URL(shopify_url);
-        url.username = app.store_api_key;
-        url.password = app.store_password;
-        shopify_url = url.toString();
+        if (!done) {
+            const app = client.multiple_apps[multiple_apps_indexes[store_name]++];
+            const url = new URL(shopify_url);
+            url.username = app.store_api_key;
+            url.password = app.store_password;
+            shopify_url = url.toString();
+        }
     } else if (client.store_access_token) {
         headers['X-Shopify-Access-Token'] = client.store_access_token;
     } else if (client.store_api_key && client.store_password) {

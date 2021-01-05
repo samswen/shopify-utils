@@ -1398,22 +1398,25 @@ async function axios_multi_tries(options) {
             if (is_graphql && response && response.data && response.data.errors && 
                 Array.isArray(response.data.errors) && response.data.errors.length > 0 &&
                 response.data.errors[0].message === 'Throttled') {
-                logger.warn('graphql call throttled');
+                //logger.warn('graphql call throttled');
+                process.stdout.write(i+'!');
                 await sleep(1000*(i*i+1));
                 continue;
             }
             return response;
         } catch(err) {
-            logger.warn(err.message);
             if (err.response) {
                 const status = err.response.status;
                 if (status === 429 || status >= 500) {
+                    // Request failed with status code 429 or 500s
+                    process.stdout.write(i+'!');
                     await sleep(1000*(i*i+1));
                 } else {
                     logger.error(err.response.data);
                     break;
                 }
             } else {
+                logger.warn(err.message);
                 break;
             }
         }
@@ -1458,7 +1461,7 @@ function get_axios_options(client, method, api_url, query, data) {
     if (client.multiple_apps) {
         const store_name = client.store_name;
         const length = client.multiple_apps.length;
-        let done  = false;
+        let done = false;
         if (!multiple_apps_indexes.hasOwnProperty(store_name)) {
             multiple_apps_indexes[store_name] = get_random_int(0, length - 1);
         } else if (multiple_apps_indexes[store_name] === length) {
@@ -1570,7 +1573,7 @@ function http_download(url, local_file_pathname) {
             headers: { Accept: '*/*' },
             responseType: 'stream',
             httpsAgent: new https.Agent({rejectUnauthorized: false}),
-            timeout: 6000
+            timeout: http_request_timeout ? http_request_timeout : 6000
         }).then(response => {
             const writer = createWriteStream(local_file_pathname);
             response.data.pipe(writer);

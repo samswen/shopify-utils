@@ -44,6 +44,7 @@ module.exports = {
     update_product_tags,
     update_product_body_html,
     delete_metafield,
+    put_metafield,
     get_images,
     get_all_media_graphql,
     upload_video,
@@ -936,8 +937,15 @@ async function put_product(client, product_id, data) {
 }
 
 async function post_product_metafields(client, product_id, data) {
-    const url = `/admin/api/${shopify_api_version}/products/$product_id}/metafields.json`;
+    const url = `/admin/api/${shopify_api_version}/products/${product_id}/metafields.json`;
     const options = get_axios_options(client, 'post', url, null, data);
+    const response = await axios_multi_tries(options);
+    return (response != null);
+}
+
+async function put_metafield(client, metafield_id, data) {
+    const url = `/admin/api/${shopify_api_version}/metafields/${metafield_id}.json`;
+    const options = get_axios_options(client, 'put', url, null, data);
     const response = await axios_multi_tries(options);
     return (response != null);
 }

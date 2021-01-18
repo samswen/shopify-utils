@@ -1199,10 +1199,14 @@ async function get_all_items(client, url, query) {
         const options = get_axios_options(client, 'get', url, query);
         const response = await axios_multi_tries(options);
         if (!response || response.status !== 200) {
-            if (response.status === 404) {
-                logger.error('404 not found', response.data);
+            if (response && response.status) {
+                if (response.status === 404) {
+                    logger.error('404 not found', response.data);
+                } else {
+                    logger.error(response.status +', job completed with error(s)', response.data);
+                }
             } else {
-                logger.error(response.status +', job completed with error(s)', response.data);
+                logger.error('job completed with error(s)', response);
             }
             break;
         }

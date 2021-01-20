@@ -27,6 +27,8 @@ module.exports = {
     get_all_smart_collections,
     get_custom_collections_count,
     get_all_custom_collections,
+    put_smart_collection,
+    put_custom_collection,
     get_metafields,
     get_all_collects,
     delete_all_products,
@@ -928,6 +930,26 @@ async function subscribe_webhook_event(client, topic, url = null) {
 
 async function put_product(client, product_id, data) {
     const options = get_axios_options(client, 'put', `/admin/api/${shopify_api_version}/products/${product_id}.json`, null, data);
+    const response = await axios_multi_tries(options);
+    if (response) {
+        return response.data;
+    } else {
+        return null; 
+    }
+}
+
+async function put_smart_collection(client, collection_id, data) {
+    const options = get_axios_options(client, 'put', `/admin/api/${shopify_api_version}/smart_collections/${collection_id}.json`, null, data);
+    const response = await axios_multi_tries(options);
+    if (response) {
+        return response.data;
+    } else {
+        return null; 
+    }
+}
+
+async function put_custom_collection(client, collection_id, data) {
+    const options = get_axios_options(client, 'put', `/admin/api/${shopify_api_version}/custom_collections/${collection_id}.json`, null, data);
     const response = await axios_multi_tries(options);
     if (response) {
         return response.data;

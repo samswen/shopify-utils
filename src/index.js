@@ -49,6 +49,7 @@ module.exports = {
     put_metafield,
     get_images,
     get_all_media_graphql,
+    get_all_video_graphql,
     upload_video,
     initialize_media_order,
     reorder_media,
@@ -550,6 +551,7 @@ async function get_all_media_graphql(client, graphql_api_id, total = 100) {
       product(id: $graphql_api_id) {
         handle
         title
+        id
         media(first:$total ) {
           edges {
             node {
@@ -592,6 +594,54 @@ async function get_all_media_graphql(client, graphql_api_id, total = 100) {
     const query = query_template.replace(/(\n|\r)/gm, ' ').replace(/ +(?= )/g,'');
     const variables = {graphql_api_id, total};
     const options = get_axios_options(client, 'post', `/admin/api/${shopify_api_version}/graphql.json`, null, {variables, query});
+    const response = await axios_multi_tries(options);
+    if (response) {
+        return response.data;
+    } else {
+        return null; 
+    }
+}
+
+async function get_all_video_graphql(graphql_api_id, total = 100) {
+    const query_template = `query get_media($graphql_api_id: ID!, $total: Int) {
+      product(id: $graphql_api_id) {
+        handle
+        title
+        id
+        media(first:$total ) {
+          edges {
+            node {
+              ... fieldsForMediaTypes
+            }
+          }
+        }
+      }
+    }
+    fragment fieldsForMediaTypes on Media {
+      alt
+      mediaContentType
+      status
+      ... on Video {
+        id
+        sources {
+          format
+          height
+          mimeType
+          url
+          width
+        }
+        originalSource {
+          format
+          height
+          mimeType
+          url
+          width
+        }
+      }
+    }`;
+    const query = query_template.replace(/(\n|\r)/gm, ' ').replace(/ +(?= )/g,'');
+    const variables = {graphql_api_id, total};
+    const options = get_axios_options('post', '/admin/api/2020-01/graphql.json', null, {variables, query});
     const response = await axios_multi_tries(options);
     if (response) {
         return response.data;

@@ -602,7 +602,7 @@ async function get_all_media_graphql(client, graphql_api_id, total = 100) {
     }
 }
 
-async function get_all_video_graphql(graphql_api_id, total = 100) {
+async function get_all_video_graphql(client, graphql_api_id, total = 100) {
     const query_template = `query get_media($graphql_api_id: ID!, $total: Int) {
       product(id: $graphql_api_id) {
         handle
@@ -641,7 +641,7 @@ async function get_all_video_graphql(graphql_api_id, total = 100) {
     }`;
     const query = query_template.replace(/(\n|\r)/gm, ' ').replace(/ +(?= )/g,'');
     const variables = {graphql_api_id, total};
-    const options = get_axios_options('post', '/admin/api/2020-01/graphql.json', null, {variables, query});
+    const options = get_axios_options(client, 'post', '/admin/api/2020-01/graphql.json', null, {variables, query});
     const response = await axios_multi_tries(options);
     if (response) {
         return response.data;

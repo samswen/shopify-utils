@@ -25,6 +25,7 @@ module.exports = {
     get_all_products,
     get_smart_collections_count,
     get_all_smart_collections,
+    get_collections_count,
     get_custom_collections_count,
     get_all_custom_collections,
     put_smart_collection,
@@ -1454,6 +1455,25 @@ async function delete_metafield(client, metafield_id) {
     const url = `/admin/api/${shopify_api_version}/metafields/${metafield_id}.json`;
     const options = get_axios_options(client, 'delete', url);
     await axios_multi_tries(options);
+}
+
+async function get_collections_count(client) {
+    let count = 0;
+    let result = await get_smart_collections_count(client);
+    if (!result || !result.hasOwnProperty('count')) {
+        logger.error('failed to get shopify smart collections count');
+        return null;
+    } else {
+        count += result.count;
+    }
+    result = await get_custom_collections_count(client);
+    if (!result || !result.hasOwnProperty('count')) {
+        logger.error('failed to get shopify custom collections count');
+        return null;
+    } else {
+        count += result.count;
+    }
+    return count;
 }
 
 async function get_next_page_items(client, url, query, cursor) {

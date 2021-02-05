@@ -1464,15 +1464,33 @@ async function get_next_page_items(client, url, query, cursor) {
     if (!url) {
         return false;
     }
+    const max_retries = 3;
+    let response = null;
     const options = get_axios_options(client, 'get', url, query);
-    const response = await axios_multi_tries(options);
-    if (!response || response.status !== 200) {
-        if (response.status === 404) {
-            logger.error('404 not found', response.data);
+    for (let i = 0; i < max_retries; i++) {
+        response = await axios_multi_tries(options);
+        if (!response || response.status !== 200) {
+            if (response) {
+                if (response.status) {
+                    logger.error(`error status code: ${response.status}`, response.data);
+                    if (response.status > 400 && response.status < 408) {
+                        return null;
+                    }
+                } else {
+                    logger.error(`error with no status code`, response);
+                }
+            } else {
+                logger.error('error with empty response', url, query);
+            }
+            if (i < max_retries - 1) {
+                await sleep(3000 * (i+1))
+            } else {
+                logger.error(`get_next_page_items multiple retries ${i+1} failed`);
+                return null;
+            }
         } else {
-            logger.error(response.status +', job completed with error(s)', response.data);
+            break;
         }
-        return null;
     }
     if (cursor) {
         cursor.url = get_next_url(response.headers.link);

@@ -49,6 +49,8 @@ module.exports = {
     delete_metafield,
     put_metafield,
     get_images,
+    get_variant_cost_graphql,
+    get_product_variants_costs_graphql,
     get_all_media_graphql,
     get_all_video_graphql,
     upload_video,
@@ -547,6 +549,56 @@ async function reorder_media_graphql(client, graphql_api_id, moves) {
     }
 }
 
+async function get_variant_cost_graphql(client, graphql_api_id) {
+    const query_template = `query get_cost($graphql_api_id: ID!) {
+        productVariant(id: $graphql_api_id) {
+          inventoryItem {
+            unitCost {
+              amount
+              currencyCode
+            }
+          }
+        }
+      }`;
+    const query = query_template.replace(/(\n|\r)/gm, ' ').replace(/ +(?= )/g,'');
+    const variables = {graphql_api_id};
+    const options = get_axios_options(client, 'post', `/admin/api/${shopify_api_version}/graphql.json`, null, {variables, query});
+    const response = await axios_multi_tries(options);
+    if (response) {
+        return response.data;
+    } else {
+        return null; 
+    }
+}
+
+async function get_product_variants_costs_graphql(client, graphql_api_id, total = 100) {
+    const query_template = `query get_product_variants_costs($graphql_api_id: ID!, $total: Int) {
+        product(id: $graphql_api_id) {
+            variants(first: $total) {
+                edges {
+                  node {
+                    inventoryItem {
+                      unitCost {
+                        amount
+                        currencyCode
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }`;
+    const query = query_template.replace(/(\n|\r)/gm, ' ').replace(/ +(?= )/g,'');
+    const variables = {graphql_api_id, total};
+    const options = get_axios_options(client, 'post', `/admin/api/${shopify_api_version}/graphql.json`, null, {variables, query});
+    const response = await axios_multi_tries(options);
+    if (response) {
+        return response.data;
+    } else {
+        return null; 
+    }
+}
+
 async function get_all_media_graphql(client, graphql_api_id, total = 100) {
     const query_template = `query get_media($graphql_api_id: ID!, $total: Int) {
       product(id: $graphql_api_id) {
@@ -642,7 +694,7 @@ async function get_all_video_graphql(client, graphql_api_id, total = 100) {
     }`;
     const query = query_template.replace(/(\n|\r)/gm, ' ').replace(/ +(?= )/g,'');
     const variables = {graphql_api_id, total};
-    const options = get_axios_options(client, 'post', '/admin/api/2020-01/graphql.json', null, {variables, query});
+    const options = get_axios_options(client, 'post', `/admin/api/${shopify_api_version}/graphql.json`, null, {variables, query});
     const response = await axios_multi_tries(options);
     if (response) {
         return response.data;

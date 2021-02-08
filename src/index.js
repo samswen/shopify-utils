@@ -549,7 +549,8 @@ async function reorder_media_graphql(client, graphql_api_id, moves) {
     }
 }
 
-async function get_variant_cost_graphql(client, graphql_api_id) {
+async function get_variant_cost_graphql(client, variant_id) {
+    const graphql_api_id = `gid://shopify/ProductVariant/${variant_id}`;
     const query_template = `query get_cost($graphql_api_id: ID!) {
         productVariant(id: $graphql_api_id) {
           inventoryItem {
@@ -571,7 +572,8 @@ async function get_variant_cost_graphql(client, graphql_api_id) {
     }
 }
 
-async function get_product_variants_costs_graphql(client, graphql_api_id, total = 100) {
+async function get_product_variants_costs_graphql(client, product_id, total = 100) {
+    const graphql_api_id = `gid://shopify/Product/${product_id}`;
     const query_template = `query get_product_variants_costs($graphql_api_id: ID!, $total: Int) {
         product(id: $graphql_api_id) {
             variants(first: $total) {
@@ -599,7 +601,8 @@ async function get_product_variants_costs_graphql(client, graphql_api_id, total 
     }
 }
 
-async function get_all_media_graphql(client, graphql_api_id, total = 100) {
+async function get_all_media_graphql(client, product_id, total = 100) {
+    const graphql_api_id = `gid://shopify/Product/${product_id}`;
     const query_template = `query get_media($graphql_api_id: ID!, $total: Int) {
       product(id: $graphql_api_id) {
         handle
@@ -655,7 +658,8 @@ async function get_all_media_graphql(client, graphql_api_id, total = 100) {
     }
 }
 
-async function get_all_video_graphql(client, graphql_api_id, total = 100) {
+async function get_all_video_graphql(client, product_id, total = 100) {
+    const graphql_api_id = `gid://shopify/Product/${product_id}`;
     const query_template = `query get_media($graphql_api_id: ID!, $total: Int) {
       product(id: $graphql_api_id) {
         handle

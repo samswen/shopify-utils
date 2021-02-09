@@ -558,7 +558,10 @@ async function get_variant_cost(client, variant_id) {
         logger.error('invalid response from shopify', result);
         return null;
     }
-    const cost = parseFloat(result.data.productVariant.inventoryItem.unitCost.amount);
+    let cost = null;
+    if (result.data.productVariant.inventoryItem.unitCost.amount !== null) {
+        cost = parseFloat(result.data.productVariant.inventoryItem.unitCost.amount);
+    }
     return cost;
 }
 
@@ -576,7 +579,10 @@ async function get_product_variants_costs(client, product_id) {
         }
         const parts = edge.node.id.split('/');
         const id = Number(parts[parts.length - 1]);
-        const cost = parseFloat(edge.node.inventoryItem.unitCost.amount);
+        let cost = null;
+        if (edge.node.inventoryItem.unitCost.amount !== null) {
+            cost = parseFloat(edge.node.inventoryItem.unitCost.amount);
+        }
         variants.push({id, cost});
     }
     return variants;

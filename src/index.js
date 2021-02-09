@@ -555,7 +555,7 @@ async function get_variant_cost(client, variant_id) {
     const result = await get_variant_cost_graphql(client, variant_id);
     if (!result || !result.data || !result.data.productVariant || !result.data.productVariant.inventoryItem || 
         !result.data.productVariant.inventoryItem.unitCost) {
-        logger.error('invalid response from shopify', JSON.stringify(result));
+        logger.warn('invalid response from shopify', JSON.stringify(result));
         return null;
     }
     let cost = null;
@@ -568,13 +568,13 @@ async function get_variant_cost(client, variant_id) {
 async function get_product_variants_costs(client, product_id) {
     const result = await get_product_variants_costs_graphql(client, product_id);
     if (!result || !result.data || !result.data.product || !result.data.product.variants || !result.data.product.variants.edges) {
-        logger.error('invalid response from shopify', JSON.stringify(result));
+        logger.warn('invalid response from shopify', JSON.stringify(result));
         return null;
     }
     const variants = [];
     for (const edge of result.data.product.variants.edges) {
         if (!edge.node || !edge.node.inventoryItem || !edge.node.inventoryItem.unitCost) {
-            logger.error('invalid edge or node', JSON.stringify(edge));
+            logger.warn('invalid edge or node', JSON.stringify(edge));
             continue;
         }
         const parts = edge.node.id.split('/');

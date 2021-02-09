@@ -573,8 +573,8 @@ async function get_product_variants_costs(client, product_id) {
     }
     const variants = [];
     for (const edge of result.data.product.variants.edges) {
-        if (!edge.node) {
-            logger.error('edge missing node', edge);
+        if (!edge.node || !edge.node.inventoryItem || !edge.node.inventoryItem.unitCost) {
+            logger.error('invalid edge or node', edge);
             continue;
         }
         const parts = edge.node.id.split('/');

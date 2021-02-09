@@ -49,6 +49,8 @@ module.exports = {
     delete_metafield,
     put_metafield,
     get_images,
+    get_product_variants_costs,
+    get_variant_cost,
     get_variant_cost_graphql,
     get_product_variants_costs_graphql,
     get_all_media_graphql,
@@ -547,6 +549,37 @@ async function reorder_media_graphql(client, graphql_api_id, moves) {
     } else {
         return null; 
     }
+}
+
+async function get_variant_cost(client, variant_id) {
+    const result = await shopify.get_variant_cost_graphql(client, variant_id);
+    if (!result || !result.data || !result.data.productVariant || !result.data.productVariant.inventoryItem || 
+        !result.data.productVariant.inventoryItem.unitCost) {
+        logger.error('invalid response from shopify', result);
+        return null;
+    }
+    const cost = parseFloat(result.data.productVariant.inventoryItem.unitCost.amount);
+    return cost;
+}
+
+async function get_product_variants_costs(client, product_id) {
+    const result = await shopify.get_product_variants_costs_graphql(client, product_id);
+    if (!result || !result.data || !result.data.product || !result.data.product.variants || !result.data.product.variants.edges) {
+        logger.error('invalid response from shopify', result);
+        return null;
+    }
+    const variants = [];
+    for (const edge of result.data.product.variants.edges) {
+        if (!edge.node) {
+            logger.error('edge missing node', edge);
+            continue;
+        }
+        const parts = edge.node.id.split('/');
+        const id = Number(parts[parts.length - 1]);
+        const cost = parseFloat(edge.node.inventoryItem.unitCost.amount);
+        variants.push({id, cost});
+    }
+    return variants;
 }
 
 async function get_variant_cost_graphql(client, variant_id) {
@@ -1771,12 +1804,12 @@ function http_download(url, local_file_pathname) {
                 resolve('failed to stream to file for http_download: ' + url);
             });
         }).catch(err => {
-            console.error(err.message + ' for ' + url);
+            logger.error(err.message + ' for ' + url);
             if (err.response && err.response.data) {
-                console.error(err.response.headers);
-                //console.error(err.response.data);
+                logger.error(err.response.headers);
+                //logger.error(err.response.data);
             } else if (err.request) {
-                console.error(err.request);
+                logger.error(err.request);
             }
             resolve(err.message);
         });

@@ -579,6 +579,7 @@ async function get_product_variants_costs_graphql(client, product_id, total = 10
             variants(first: $total) {
                 edges {
                   node {
+                    id
                     inventoryItem {
                       unitCost {
                         amount

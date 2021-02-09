@@ -552,7 +552,7 @@ async function reorder_media_graphql(client, graphql_api_id, moves) {
 }
 
 async function get_variant_cost(client, variant_id) {
-    const result = await shopify.get_variant_cost_graphql(client, variant_id);
+    const result = await get_variant_cost_graphql(client, variant_id);
     if (!result || !result.data || !result.data.productVariant || !result.data.productVariant.inventoryItem || 
         !result.data.productVariant.inventoryItem.unitCost) {
         logger.error('invalid response from shopify', result);
@@ -563,7 +563,7 @@ async function get_variant_cost(client, variant_id) {
 }
 
 async function get_product_variants_costs(client, product_id) {
-    const result = await shopify.get_product_variants_costs_graphql(client, product_id);
+    const result = await get_product_variants_costs_graphql(client, product_id);
     if (!result || !result.data || !result.data.product || !result.data.product.variants || !result.data.product.variants.edges) {
         logger.error('invalid response from shopify', result);
         return null;

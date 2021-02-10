@@ -36,6 +36,7 @@ module.exports = {
     delete_product,
     post_product,
     put_product,
+    put_variant,
     update_inventory_item,
     update_product_metafields,
     update_variant_metafields,
@@ -1077,6 +1078,16 @@ async function subscribe_webhook_event(client, topic, url = null) {
 
 async function put_product(client, product_id, data) {
     const options = get_axios_options(client, 'put', `/admin/api/${shopify_api_version}/products/${product_id}.json`, null, data);
+    const response = await axios_multi_tries(options);
+    if (response) {
+        return response.data;
+    } else {
+        return null; 
+    }
+}
+
+async function put_variant(client, variant_id, data) {
+    const options = get_axios_options(client, 'put', `/admin/api/${shopify_api_version}/variants/${variant_id}.json`, null, data);
     const response = await axios_multi_tries(options);
     if (response) {
         return response.data;

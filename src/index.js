@@ -1696,24 +1696,27 @@ function get_axios_options(client, method, api_url, query, data) {
     }
     const headers = { accept: 'application/json' };
     if (client.multiple_apps) {
+        // the default client.store_access_token not used here due to potential access scope permission issue
         const store_name = client.store_name;
         const length = client.multiple_apps.length;
-        let done = false;
+        let app_index;
         if (!multiple_apps_indexes.hasOwnProperty(store_name)) {
-            multiple_apps_indexes[store_name] = get_random_int(0, length - 1);
+            app_index = get_random_int(0, length - 1);
         } else if (multiple_apps_indexes[store_name] === length) {
-            multiple_apps_indexes[store_name] = 0;
-            if (client.store_access_token) {
-                done = true;
-                headers['X-Shopify-Access-Token'] = client.store_access_token;
-            }
+            app_index = 0;
+        } else {
+            app_index = multiple_apps_indexes[store_name];
         }
-        if (!done) {
-            const app = client.multiple_apps[multiple_apps_indexes[store_name]++];
-            const url = new URL(shopify_url);
+        multiple_apps_indexes[store_name] = app_index + 1;
+        const app = client.multiple_apps[app_index];
+        const url = new URL(shopify_url);
+        if (app.store_api_key && app.store_password) {
             url.username = app.store_api_key;
             url.password = app.store_password;
             shopify_url = url.toString();
+        } else {
+            logger.error(`missing access credential store_api_key and store_password in multiple_apps[${app_index}]`);
+            return null;    
         }
     } else if (client.store_access_token) {
         headers['X-Shopify-Access-Token'] = client.store_access_token;

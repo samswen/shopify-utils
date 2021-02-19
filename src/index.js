@@ -1,6 +1,7 @@
 'use strict';
 
 const axios = require('axios');
+const https = require('https');
 const fs = require('fs');
 const os = require('os');
 const { spawn } = require('child_process');
@@ -366,10 +367,6 @@ async function upload_videos(client, product_id, videos) {
 }
 
 async function initialize_media_order(client, product_id, type) {
-    if (!['settings', 'wedding-rings', 'jewelry'].includes(type)) {
-        logger.error('unsupported type: ' + type);
-        return false;
-    }
     const graphql_api_id = 'gid://shopify/Product/' + product_id;
     const result = await get_all_media_graphql(client, graphql_api_id);
     //logger.info(JSON.stringify(result, null, 2));
@@ -429,10 +426,6 @@ async function initialize_media_order(client, product_id, type) {
 }
 
 async function reorder_media(client, product_id, type) {
-    if (!['settings', 'wedding-rings', 'jewelry'].includes(type)) {
-        logger.error('unsupported type: ' + type);
-        return false;
-    }
     const graphql_api_id = 'gid://shopify/Product/' + product_id;
     const result = await get_all_media_graphql(client, graphql_api_id);
     if (!result || !result.data || !result.data.product || !result.data.product || !result.data.product.media ||
@@ -460,12 +453,7 @@ async function reorder_media(client, product_id, type) {
                 return false;
             }
             const parts = node.alt.split('/');
-            if (type === 'settings') {
-                parts.pop();
-                key = parts.join('/');
-            } else if (type === 'wedding-rings' || type === 'jewelry') {
-                key = parts[0];
-            }
+            key = parts[0];
             //logger.trace('image key for ' + product_id + ': ' + key);
             if (!images[key]) {
                 images[key] = {id: node.id};
@@ -1818,10 +1806,10 @@ function http_download(url, local_file_pathname) {
             method: 'GET',
             headers: { Accept: '*/*' },
             responseType: 'stream',
-            //httpsAgent: new https.Agent({rejectUnauthorized: false}),
+            httpsAgent: new https.Agent({rejectUnauthorized: false}),
             timeout: http_request_timeout ? http_request_timeout : 6000
         }).then(response => {
-            const writer = createWriteStream(local_file_pathname);
+            const writer = fs.createWriteStream(local_file_pathname);
             response.data.pipe(writer);
             writer.on('finish', () => { 
                 resolve(true); 

@@ -643,7 +643,10 @@ async function get_product_variants_costs_graphql(client, product_id, total = 10
 }
 
 async function get_all_media_graphql(client, product_id, total = 100) {
-    const graphql_api_id = `gid://shopify/Product/${product_id}`;
+    let graphql_api_id = product_id;
+    if (typeof graphql_api_id === 'number' || !graphql_api_id.startsWith('gid://shopify')) {
+        graphql_api_id = `gid://shopify/Product/${product_id}`;
+    }
     const query_template = `query get_media($graphql_api_id: ID!, $total: Int) {
       product(id: $graphql_api_id) {
         handle
@@ -1137,6 +1140,9 @@ async function get_variant_metafields(client, product_id, variant_id, query) {
 }
 
 async function post_variant_metafields(client, product_id, variant_id, data) {
+    if (!data.metafield) {
+        data = {metafield: data};
+    }
     const url = `/admin/api/${shopify_api_version}/products/${product_id}/variants/${variant_id}/metafields.json`;
     const options = get_axios_options(client, 'post', url, null, data);
     const response = await axios_multi_tries(options);

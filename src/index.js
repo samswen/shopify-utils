@@ -1818,7 +1818,7 @@ function http_download(url, local_file_pathname) {
             method: 'GET',
             headers: { Accept: '*/*' },
             responseType: 'stream',
-            httpsAgent: new https.Agent({rejectUnauthorized: false}),
+            //httpsAgent: new https.Agent({rejectUnauthorized: false}),
             timeout: http_request_timeout ? http_request_timeout : 6000
         }).then(response => {
             const writer = createWriteStream(local_file_pathname);

@@ -9,6 +9,8 @@ const { stdout, stderr } = require('process');
 
 module.exports = {
     setup,
+    axios_multi_tries,
+    get_axios_options,
     get_myshop_info,
     get_locations,
     get_product,
@@ -1660,7 +1662,7 @@ function get_random_int(min, max) {
     return Math.floor(min + Math.random() * Math.floor(max - min));
 }
 
-let multiple_apps_indexes = {};
+const multiple_apps_indexes = {};
 
 function get_axios_options(client, method, api_url, query, data) {
     if (!client) {

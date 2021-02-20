@@ -11,6 +11,9 @@ module.exports = {
     setup,
     axios_multi_tries,
     get_axios_options,
+    get_next_page_items,
+    get_next_url,
+    get_prev_url,
     get_myshop_info,
     get_locations,
     get_product,
@@ -532,7 +535,7 @@ async function reorder_media_graphql(client, graphql_api_id, moves) {
       }
     }`;
     const query = query_template.replace(/(\n|\r)/gm, ' ').replace(/ +(?= )/g,'');
-    const variables = {graphql_api_id, moves};
+      
     const options = get_axios_options(client, 'post', `/admin/api/${shopify_api_version}/graphql.json`, null, {variables, query});
     const response = await axios_multi_tries(options);
     if (response) {

@@ -29,6 +29,9 @@ module.exports = {
     get_customer_metafields,
     post_customer_metafields,
     subscribe_webhook_event,
+    get_order,
+    find_order,
+    get_next_page_orders,
     delete_webhook,
     get_all_webhooks,
     get_products_count,
@@ -184,13 +187,42 @@ async function find_customer(client, query) {
 }
 
 async function put_customer(client, customer_id, data) {
-    const options = get_axios_options(client, 'put', `/admin/api/${shopify_api_version}/customers/$customer_id}.json`, null, data);
+    const options = get_axios_options(client, 'put', `/admin/api/${shopify_api_version}/customers/${customer_id}.json`, null, data);
     const response = await axios_multi_tries(options);
     if (response) {
         return response.data;
     } else {
         return null; 
     }
+}
+
+async function get_order(client, order_id, query) {
+    try {
+        const options = get_axios_options(client, 'get', `/admin/api/${shopify_api_version}/orders/${order_id}.json`, query);
+        const response = await axios_multi_tries(options);
+        return response.data;
+    } catch(err) {
+        logger.error(err.message);
+        return false;
+    }
+
+}
+
+async function find_order(client, query) {
+    try {
+        const options = get_axios_options(client, 'get', `/admin/api/${shopify_api_version}/orders.json`, query);
+        const response = await axios_multi_tries(options);
+        return response.data;
+    } catch(err) {
+        logger.error(err.message);
+        return false;
+    }
+}
+
+async function get_next_page_orders(client, cursor, query) {
+    const q = prepare_query(query);
+    const url = `/admin/api/${shopify_api_version}/orders.json`;
+    return get_next_page_items(client, url, q, cursor);
 }
 
 async function get_script_tags_count(client) {

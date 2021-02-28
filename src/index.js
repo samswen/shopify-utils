@@ -49,6 +49,7 @@ module.exports = {
     put_smart_collection,
     put_custom_collection,
     get_metafields,
+    get_next_page_metafields,
     get_all_collects,
     delete_all_products,
     delete_product,
@@ -1255,6 +1256,12 @@ async function get_metafields(client, query) {
     const q = prepare_query(query);
     const url = `/admin/api/${shopify_api_version}/metafields.json`;
     return get_all_items(client, url, q);
+}
+
+async function get_next_page_metafields(client, cursor, query) {
+    const q = prepare_query(query);
+    const url = `/admin/api/${shopify_api_version}/metafields.json`;
+    return get_next_page_items(client, url, q, cursor);
 }
 
 async function get_all_smart_collections(client, query) {

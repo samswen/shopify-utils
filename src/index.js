@@ -32,6 +32,8 @@ module.exports = {
     get_order,
     find_order,
     get_next_page_orders,
+    get_abandoned_checkouts_count,
+    get_next_abandoned_checkouts,
     delete_webhook,
     get_all_webhooks,
     get_products_count,
@@ -223,6 +225,24 @@ async function find_order(client, query) {
 async function get_next_page_orders(client, cursor, query) {
     const q = prepare_query(query);
     const url = `/admin/api/${shopify_api_version}/orders.json`;
+    return get_next_page_items(client, url, q, cursor);
+}
+
+async function get_abandoned_checkouts_count(client, query) {
+    try {
+        const options = get_axios_options(client, 'get', `/admin/api/${shopify_api_version}/checkouts/count.json`, query);
+        const response = await axios_multi_tries(options);
+        return response.data;
+    } catch(err) {
+        logger.error(err.message);
+        return false;
+    }
+
+}
+
+async function get_next_abandoned_checkouts(client, cursor, query) {
+    const q = prepare_query(query);
+    const url = `/admin/api/${shopify_api_version}/checkouts.json`;
     return get_next_page_items(client, url, q, cursor);
 }
 

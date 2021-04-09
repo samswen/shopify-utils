@@ -53,6 +53,8 @@ module.exports = {
     get_metafields,
     get_next_page_metafields,
     get_all_collects,
+    get_all_collection_products,
+    get_next_page_collection_products,
     delete_all_products,
     delete_product,
     post_product,
@@ -1272,6 +1274,12 @@ async function get_all_products(client, query) {
     return get_all_items(client, url, q);
 }
 
+async function get_all_collection_products(client, collection_id, query) {
+    const q = prepare_query(query);
+    const url = `/admin/api/${shopify_api_version}/collections/${collection_id}/products.json`;
+    return get_all_items(client, url, q);
+}
+
 async function get_metafields(client, query) {
     const q = prepare_query(query);
     const url = `/admin/api/${shopify_api_version}/metafields.json`;
@@ -1355,6 +1363,12 @@ async function get_custom_collections_count(client) {
 async function get_next_page_products(client, cursor, query) {
     const q = prepare_query(query);
     const url = `/admin/api/${shopify_api_version}/products.json`;
+    return get_next_page_items(client, url, q, cursor);
+}
+
+async function get_next_page_collection_products(client, collection_id, cursor, query) {
+    const q = prepare_query(query);
+    const url = `/admin/api/${shopify_api_version}/collections/${collection_id}/products.json`;
     return get_next_page_items(client, url, q, cursor);
 }
 

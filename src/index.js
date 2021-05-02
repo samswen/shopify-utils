@@ -1256,8 +1256,8 @@ async function get_metafield(client, metafield_id) {
     const url = `/admin/api/${shopify_api_version}/metafields/${metafield_id}.json`;
     const options = get_axios_options(client, 'get', url, null);
     const response = await axios_multi_tries(options);
-    if (response && response.metafield) {
-        return response.metafield;
+    if (response && response.data) {
+        return response.data;
     } else {
         return null;
     }

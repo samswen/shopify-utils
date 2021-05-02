@@ -50,6 +50,7 @@ module.exports = {
     get_all_custom_collections,
     put_smart_collection,
     put_custom_collection,
+    get_metafield,
     get_metafields,
     get_next_page_metafields,
     get_all_collects,
@@ -1249,6 +1250,17 @@ async function put_metafield(client, metafield_id, data) {
     const options = get_axios_options(client, 'put', url, null, data);
     const response = await axios_multi_tries(options);
     return (response != null);
+}
+
+async function get_metafield(client, metafield_id) {
+    const url = `/admin/api/${shopify_api_version}/metafields/${metafield_id}.json`;
+    const options = get_axios_options(client, 'get', url, null);
+    const response = await axios_multi_tries(options);
+    if (response && response.metafield) {
+        return response.metafield;
+    } else {
+        return null;
+    }
 }
 
 async function get_variant_metafields(client, product_id, variant_id, query) {

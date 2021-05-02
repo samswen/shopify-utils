@@ -1,6 +1,6 @@
 {
   "name": "@samwen/shopify-utils",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "a collection of functions for using shopify apis",
   "main": "src/index.js",
   "scripts": {

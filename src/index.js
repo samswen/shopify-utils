@@ -929,7 +929,7 @@ async function upload_video_to_stage(client, filepath) {
         return false;
     }
     const target = result.data.stagedUploadsCreate.stagedTargets[0];
-    logger.trace('resourceUrl: ' + target.resourceUrl);
+    //logger.trace('resourceUrl: ' + target.resourceUrl);
     const param_hash = {};
     for (const param of target.parameters) {
         param_hash[param.name] = param.value;

@@ -110,7 +110,7 @@ let logger = console;
 let http_request_timeout = 180000;
 let main_location_id = null;
 let aws_events_arn = null;
-let shopify_api_version = '2020-07';
+let shopify_api_version = '2021-07';
 
 function setup(config, arg_logger) {
     if (config) {

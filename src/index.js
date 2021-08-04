@@ -62,6 +62,7 @@ module.exports = {
     put_product,
     put_variant,
     get_inventory_item,
+    get_inventory_items,
     update_inventory_item,
     update_product_metafields,
     update_variant_metafields,
@@ -1559,6 +1560,16 @@ async function get_all_items(client, url, query) {
         query = null;
     }
     return items;
+}
+
+async function get_inventory_items(client, inventory_item_ids) {
+    const options = get_axios_options(client, 'get', `/admin/api/${shopify_api_version}/inventory_items.json?limit=250&ids=${inventory_item_ids.join(',')}`);
+    const response = await axios_multi_tries(options);
+    if (response) {
+        return response.data;
+    } else {
+        return false; 
+    }
 }
 
 async function get_inventory_item(client, inventory_item_id) {

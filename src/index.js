@@ -42,6 +42,7 @@ module.exports = {
     get_next_page_smart_collections,
     get_next_page_custom_collections,
     get_collection_metafields,
+    get_products,
     get_all_products,
     get_smart_collections_count,
     get_all_smart_collections,
@@ -1560,6 +1561,16 @@ async function get_all_items(client, url, query) {
         query = null;
     }
     return items;
+}
+
+async function get_products(client, product_ids) {
+    const options = get_axios_options(client, 'get', `/admin/api/${shopify_api_version}/products.json?limit=250&ids=${product_ids.join(',')}`);
+    const response = await axios_multi_tries(options);
+    if (response) {
+        return response.data;
+    } else {
+        return false; 
+    }
 }
 
 async function get_inventory_items(client, inventory_item_ids) {

@@ -1845,7 +1845,10 @@ async function axios_multi_tries(options) {
             }
         }
     }
-    logger.error('failed request for ' + options.url);
+    logger.error(`failed request for ${options.method} ${options.url}`);
+    if (process.env.TRACE) {
+        console.trace(options);
+    }
     return null;
 }
 

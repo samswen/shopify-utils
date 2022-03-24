@@ -62,6 +62,7 @@ module.exports = {
     post_product,
     post_variant,
     post_image,
+    put_image,
     put_product,
     put_variant,
     get_inventory_item,
@@ -1191,7 +1192,19 @@ async function post_product(client, product) {
 }
 
 async function post_image(client, product_id, data) {
+    if (!data.image) data = {image: data};
     const options = get_axios_options(client, 'post', `/admin/api/${shopify_api_version}/products/${product_id}/images.json`, null, data);
+    const response = await axios_multi_tries(options);
+    if (response) {
+        return response.data;
+    } else {
+        return null; 
+    }
+}
+
+async function put_image(client, product_id, data) {
+    if (!data.image) data = {image: data};
+    const options = get_axios_options(client, 'put', `/admin/api/${shopify_api_version}/products/${product_id}/images.json`, null, data);
     const response = await axios_multi_tries(options);
     if (response) {
         return response.data;

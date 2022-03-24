@@ -60,6 +60,8 @@ module.exports = {
     delete_all_products,
     delete_product,
     post_product,
+    post_variant,
+    post_image,
     put_product,
     put_variant,
     get_inventory_item,
@@ -113,19 +115,32 @@ let logger = console;
 let http_request_timeout = 180000;
 let main_location_id = null;
 let aws_events_arn = null;
-let shopify_api_version = '2021-07';
+let shopify_api_version = '2022-01';
 
 function setup(config, arg_logger) {
     if (config) {
-        main_location_id = config.get('main_location_id');
-        aws_events_arn = config.get('aws_events_arn');
-        const request_timeout = config.get('http_request_timeout');
-        if (request_timeout) {
-            http_request_timeout = request_timeout;
-        }
-        const api_version = config.get('shopify_api_version');
-        if (api_version) {
-            shopify_api_version = api_version;
+        if (config.get) {
+            main_location_id = config.get('main_location_id');
+            aws_events_arn = config.get('aws_events_arn');
+            const request_timeout = config.get('http_request_timeout');
+            if (request_timeout) {
+                http_request_timeout = request_timeout;
+            }
+            const api_version = config.get('shopify_api_version');
+            if (api_version) {
+                shopify_api_version = api_version;
+            }
+        } else {
+            main_location_id = config.main_location_id;
+            aws_events_arn = config.aws_events_arn;
+            const request_timeout = config.http_request_timeout;
+            if (request_timeout) {
+                http_request_timeout = request_timeout;
+            }
+            const api_version = config.shopify_api_version;
+            if (api_version) {
+                shopify_api_version = api_version;
+            }
         }
     }
     if (arg_logger) {
@@ -1165,7 +1180,29 @@ async function get_product_metafields(client, product_id, query) {
 }
 
 async function post_product(client, product) {
+    if (!product.product) product = { product };
     const options = get_axios_options(client, 'post', `/admin/api/${shopify_api_version}/products.json`, null, product);
+    const response = await axios_multi_tries(options);
+    if (response) {
+        return response.data;
+    } else {
+        return null; 
+    }
+}
+
+async function post_image(client, product_id, data) {
+    const options = get_axios_options(client, 'post', `/admin/api/${shopify_api_version}/products/${product_id}/images.json`, null, data);
+    const response = await axios_multi_tries(options);
+    if (response) {
+        return response.data;
+    } else {
+        return null; 
+    }
+}
+
+async function post_variant(client, product_id, variant) {
+    if (!variant.variant) variant = { variant };
+    const options = get_axios_options(client, 'post', `/admin/api/${shopify_api_version}/products/${product_id}/variants.json`, null, variant);
     const response = await axios_multi_tries(options);
     if (response) {
         return response.data;

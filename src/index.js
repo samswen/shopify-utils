@@ -1202,9 +1202,9 @@ async function post_image(client, product_id, data) {
     }
 }
 
-async function put_image(client, product_id, data) {
+async function put_image(client, product_id, image_id, data) {
     if (!data.image) data = {image: data};
-    const options = get_axios_options(client, 'put', `/admin/api/${shopify_api_version}/products/${product_id}/images.json`, null, data);
+    const options = get_axios_options(client, 'put', `/admin/api/${shopify_api_version}/products/${product_id}/images/${image_id}.json`, null, data);
     const response = await axios_multi_tries(options);
     if (response) {
         return response.data;

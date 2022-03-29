@@ -65,6 +65,7 @@ module.exports = {
     put_image,
     put_product,
     put_variant,
+    delete_variant,
     get_inventory_item,
     get_inventory_items,
     update_inventory_item,
@@ -1263,6 +1264,16 @@ async function put_product(client, product_id, data) {
 
 async function put_variant(client, variant_id, data) {
     const options = get_axios_options(client, 'put', `/admin/api/${shopify_api_version}/variants/${variant_id}.json`, null, data);
+    const response = await axios_multi_tries(options);
+    if (response) {
+        return response.data;
+    } else {
+        return null; 
+    }
+}
+
+async function delete_variant(client, product_id, variant_id) {
+    const options = get_axios_options(client, 'delete', `/admin/api/${shopify_api_version}/products/${product_id}/variants/${variant_id}.json`, null);
     const response = await axios_multi_tries(options);
     if (response) {
         return response.data;

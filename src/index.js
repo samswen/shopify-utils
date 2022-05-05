@@ -87,6 +87,7 @@ module.exports = {
     get_product_variants_costs_graphql,
     get_all_media_graphql,
     get_all_video_graphql,
+    get_videos,
     upload_video,
     initialize_media_order,
     reorder_media,
@@ -1624,8 +1625,36 @@ async function get_all_items(client, url, query) {
     return items;
 }
 
-async function get_products(client, product_ids) {
-    const options = get_axios_options(client, 'get', `/admin/api/${shopify_api_version}/products.json?limit=250&ids=${product_ids.join(',')}`);
+async function get_videos(client, product_id) {
+
+    const medias = await get_all_video_graphql(client, product_id);
+
+    const videos = [];
+
+    if (!medias || !medias.data || !medias.data.product || !medias.data.product.media || !medias.data.product.media.edges) return videos;
+
+    for (const { node } of medias.data.product.media.edges) {
+        if (!node || node.mediaContentType !== 'VIDEO' || !node.alt || !node.sources) continue;
+        const { id, alt, sources } = node;
+        const source = sources.find(x => x.mimeType === 'video/mp4');
+        if (!source) continue;
+        const {url, height, width, mimeType, format} = source;
+        videos.push({id: Number(id.split('/').pop()), alt, src: url, height, width, mimeType, format});
+    }
+
+    return videos;
+}
+
+async function get_products(client, product_ids, query) {
+    if (!product_ids || product_ids.length > 250) {
+        throw new Error('missing product_ids or product_ids length is too large');
+    }
+    if (!query) query = {limit: 250, ids: product_ids.join(',')};
+    else {
+        query.limit = 250; 
+        query.ids = product_ids.join(',');
+    }
+    const options = get_axios_options(client, 'get', `/admin/api/${shopify_api_version}/products.json`, query);
     const response = await axios_multi_tries(options);
     if (response) {
         return response.data;

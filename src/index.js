@@ -118,7 +118,7 @@ let logger = console;
 let http_request_timeout = 180000;
 let main_location_id = null;
 let aws_events_arn = null;
-let shopify_api_version = '2022-01';
+let shopify_api_version = '2022-04';
 
 function setup(config, arg_logger) {
     if (config) {
@@ -1341,8 +1341,11 @@ async function post_variant_metafields(client, product_id, variant_id, data) {
     const url = `/admin/api/${shopify_api_version}/products/${product_id}/variants/${variant_id}/metafields.json`;
     const options = get_axios_options(client, 'post', url, null, data);
     const response = await axios_multi_tries(options);
-    return (response != null);
-    
+    if (response && response.data) {
+        return response.data;
+    } else {
+        return null;
+    } 
 }
 
 async function get_all_products(client, query) {
